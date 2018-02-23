@@ -1,0 +1,14 @@
+application: datastore-sandbox-1114
+version: 1
+runtime: go
+api_version: go1
+module: default
+
+handlers:
+- url: /protected
+  script: _go_app
+  login: admin
+  auth_fail_action: unauthorized
+
+- url: /.*
+  script: _go_app
