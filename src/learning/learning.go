@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"runtime"
 	"time"
 
 	"github.com/go-errors/errors"
@@ -12,6 +13,28 @@ import (
 	"google.golang.org/appengine/datastore"
 	"google.golang.org/appengine/log"
 )
+
+func Meta(w http.ResponseWriter, r *http.Request) {
+	ctx := appengine.NewContext(r)
+
+	moduleHostName, err := appengine.ModuleHostname(ctx, "", "", "")
+	if err != nil {
+		moduleHostName = "ERROR: " + err.Error()
+	}
+
+	w.Header().Set("Content-Type", "text/plain")
+	fmt.Fprintln(w, "AppID:                  ", appengine.AppID(ctx))
+	fmt.Fprintln(w, "DefaultVersionHostname: ", appengine.DefaultVersionHostname(ctx))
+	fmt.Fprintln(w, "ModuleName:             ", appengine.ModuleName(ctx))
+	fmt.Fprintln(w, "ModuleHostname:         ", moduleHostName)
+	fmt.Fprintln(w, "VersionID:              ", appengine.VersionID(ctx))
+	fmt.Fprintln(w, "InstanceID:             ", appengine.InstanceID())
+	fmt.Fprintln(w, "Datacenter:             ", appengine.Datacenter(ctx))
+	fmt.Fprintln(w, "ServerSoftware:         ", appengine.ServerSoftware())
+	fmt.Fprintln(w, "RequestID:              ", appengine.RequestID(ctx))
+	fmt.Fprintln(w, "IsDevAppServer:         ", appengine.IsDevAppServer())
+	fmt.Fprintln(w, "runtime.Version:        ", runtime.Version())
+}
 
 func Echo(w http.ResponseWriter, r *http.Request) {
 	for key, vals := range r.Header {

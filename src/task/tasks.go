@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/url"
+	"runtime"
 	"strconv"
 	"strings"
 	"time"
@@ -217,4 +218,40 @@ func Params(_ http.ResponseWriter, r *http.Request) {
 
 	log.Infof(ctx, "Got parameters: %+v", r.PostForm)
 	log.Infof(ctx, "Got headers: %+v", r.Header)
+}
+
+func WhichServiceDoesATaskRunOn(_ http.ResponseWriter, r *http.Request) {
+	ctx := appengine.NewContext(r)
+
+	if r.Header.Get("X-AppEngine-TaskName") == "" {
+		t := taskqueue.NewPOSTTask("/whichServiceForTask", url.Values{
+			"startedByService": []string{appengine.ModuleName(ctx)},
+		})
+		t, err := taskqueue.Add(ctx, t, "slow-queue")
+
+		if err != nil {
+			log.Errorf(ctx, "Error adding task: %s", err)
+		} else {
+			log.Infof(ctx, "Added task: %s", t.Name)
+		}
+		return
+	}
+
+	moduleHostName, err := appengine.ModuleHostname(ctx, "", "", "")
+	if err != nil {
+		moduleHostName = "ERROR: " + err.Error()
+	}
+
+	log.Infof(ctx, "startedByService:       %s\n", r.PostFormValue("startedByService"))
+	log.Infof(ctx, "AppID:                  %s\n", appengine.AppID(ctx))
+	log.Infof(ctx, "DefaultVersionHostname: %s\n", appengine.DefaultVersionHostname(ctx))
+	log.Infof(ctx, "ModuleName:             %s\n", appengine.ModuleName(ctx))
+	log.Infof(ctx, "ModuleHostname:         %s\n", moduleHostName)
+	log.Infof(ctx, "VersionID:              %s\n", appengine.VersionID(ctx))
+	log.Infof(ctx, "InstanceID:             %s\n", appengine.InstanceID())
+	log.Infof(ctx, "Datacenter:             %s\n", appengine.Datacenter(ctx))
+	log.Infof(ctx, "ServerSoftware:         %s\n", appengine.ServerSoftware())
+	log.Infof(ctx, "RequestID:              %s\n", appengine.RequestID(ctx))
+	log.Infof(ctx, "IsDevAppServer:         %v\n", appengine.IsDevAppServer())
+	log.Infof(ctx, "runtime.Version:        %s\n", runtime.Version())
 }

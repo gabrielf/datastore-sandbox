@@ -16,6 +16,8 @@ func init() {
 func RegisterRoutes() {
 	http.HandleFunc("/", categories.Index)
 	http.HandleFunc("/test", categories.TestEventualConsistency)
+
+	http.HandleFunc("/meta", learning.Meta)
 	http.HandleFunc("/echo", learning.Echo)
 	http.HandleFunc("/log", learning.CreateLogEntry)
 	http.HandleFunc("/logtrans", learning.CreateLogEntryInTransaction)
@@ -30,6 +32,7 @@ func RegisterRoutes() {
 	http.HandleFunc("/protected", task.Protected)
 	http.HandleFunc("/triggerParamsTask", task.TriggerParamsTask)
 	http.HandleFunc("/params", task.Params)
+	http.HandleFunc("/whichServiceForTask", task.WhichServiceDoesATaskRunOn)
 
 	// Errors
 	http.HandleFunc("/errors/timeout1", neterrors.Timeout1)
