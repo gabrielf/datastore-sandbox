@@ -16,6 +16,7 @@ func init() {
 func RegisterRoutes() {
 	http.HandleFunc("/", categories.Index)
 	http.HandleFunc("/test", categories.TestEventualConsistency)
+	http.HandleFunc("/echo", learning.Echo)
 	http.HandleFunc("/log", learning.CreateLogEntry)
 	http.HandleFunc("/logtrans", learning.CreateLogEntryInTransaction)
 

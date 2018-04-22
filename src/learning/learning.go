@@ -2,6 +2,7 @@ package learning
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -11,6 +12,14 @@ import (
 	"google.golang.org/appengine/datastore"
 	"google.golang.org/appengine/log"
 )
+
+func Echo(w http.ResponseWriter, r *http.Request) {
+	for key, vals := range r.Header {
+		for _, val := range vals {
+			fmt.Fprintln(w, key, ": ", val)
+		}
+	}
+}
 
 func CreateLogEntry(w http.ResponseWriter, r *http.Request) {
 	ctx := appengine.NewContext(r)
