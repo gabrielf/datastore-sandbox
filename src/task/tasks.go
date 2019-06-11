@@ -255,3 +255,38 @@ func WhichServiceDoesATaskRunOn(_ http.ResponseWriter, r *http.Request) {
 	log.Infof(ctx, "IsDevAppServer:         %v\n", appengine.IsDevAppServer())
 	log.Infof(ctx, "runtime.Version:        %s\n", runtime.Version())
 }
+
+func TaskWithETA(w http.ResponseWriter, r *http.Request) {
+	ctx := appengine.NewContext(r)
+
+	// If called via HTTP from a client, not as a task
+	if r.Header.Get("X-AppEngine-TaskName") == "" {
+		if r.FormValue("eta") == "" {
+			http.Error(w, "Missing eta", http.StatusBadRequest)
+			return
+		}
+		eta, err := time.Parse(time.RFC3339Nano, r.FormValue("eta"))
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		// Start task to same URL
+		t := taskqueue.NewPOSTTask("/taskWithETA", url.Values{
+			"eta": []string{r.FormValue("eta")},
+		})
+		t.ETA = eta
+
+		t, err = taskqueue.Add(ctx, t, "slow-queue")
+		if err != nil {
+			log.Errorf(ctx, "Error adding task: %s", err)
+		} else {
+			log.Infof(ctx, "Added task: %s", t.Name)
+		}
+		return
+	}
+
+	// If called as a task
+	log.Infof(ctx, "Set eta:    %s\n", r.FormValue("eta"))
+	log.Infof(ctx, "time.Now(): %s\n", time.Now().Format(time.RFC3339Nano))
+}

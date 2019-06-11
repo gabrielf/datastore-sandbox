@@ -33,6 +33,7 @@ func RegisterRoutes() {
 	http.HandleFunc("/triggerParamsTask", task.TriggerParamsTask)
 	http.HandleFunc("/params", task.Params)
 	http.HandleFunc("/whichServiceForTask", task.WhichServiceDoesATaskRunOn)
+	http.HandleFunc("/taskWithETA", task.TaskWithETA)
 
 	// Errors
 	http.HandleFunc("/errors/timeout1", neterrors.Timeout1)
