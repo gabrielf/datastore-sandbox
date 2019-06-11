@@ -8,6 +8,6 @@ test:
 	ginkgo -r src test
 
 prod-logs:
-    open https://console.cloud.google.com/logs/viewer?project=datastore-sandbox-1114
+	open https://console.cloud.google.com/logs/viewer?project=datastore-sandbox-1114
 
 .PHONY: deploy run test prod-logs
